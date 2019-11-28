@@ -2,6 +2,7 @@
 require './vendor/autoload.php';
 use Dotenv\Dotenv;
 
+// 環境変数読み込み
 $dotenv = Dotenv::create(__DIR__);
 $dotenv->load();
 $accessToken = $_ENV["LINE_KEY"];
@@ -9,10 +10,11 @@ $accessToken = $_ENV["LINE_KEY"];
 //ユーザーからのメッセージ取得
 $json_string = file_get_contents('php://input');
 $jsonObj = json_decode($json_string);
-//メッセージのタイプ取得
-$type = $jsonObj->{"events"}[0]->{"message"}->{"type"};
+
 //メッセージ取得
+$type = $jsonObj->{"events"}[0]->{"message"}->{"type"};
 $text = $jsonObj->{"events"}[0]->{"message"}->{"text"};
+
 //ReplyToken取得
 $replyToken = $jsonObj->{"events"}[0]->{"replyToken"};
 
@@ -21,13 +23,31 @@ if ($type != "text") {
     exit;
 }
 
+// jsonファイル読み込み
+$url = "json/pokemon.json";
+$json = file_get_contents($url);
+$json = mb_convert_encoding($json, 'UTF8', 'ASCII,JIS,UTF-8,EUC-JP,SJIS-WIN');
+$pokemons = json_decode($json, true);
+
+// 検索
+$result = "";
+foreach ($pokemons as $pokemon) {
+    if ($pokemon['name'] === $text) {
+        $types = $pokemon['types'];
+        break;
+    }
+}
+foreach ($types as $type) {
+    $result .= $type;
+}
+
 //返信データ作成
 $response_format_text2 = "";
 $response_format_text3 = "";
 
 $response_format_text = [
     "type" => "text",
-    "text" => $text,
+    "text" => $result,
 ];
 
 $post_data = [
