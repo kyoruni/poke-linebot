@@ -1,0 +1,6 @@
+{
+  "name": "kyoruni/poke-linebot",
+  "require": {
+    "vlucas/phpdotenv": "*"
+  }
+}
