@@ -2,16 +2,64 @@
   {
     "no": 1,
     "name": "フシギダネ",
-    "types": ["くさ", "どく"]
+    "types": ["くさ", "どく"],
+    "abilitys": ["しんりょく"],
+    "hidden_abilitys": ["ようりょくそ"]
   },
   {
     "no": 2,
     "name": "フシギソウ",
-    "types": ["くさ", "どく"]
+    "types": ["くさ", "どく"],
+    "abilitys": ["しんりょく"],
+    "hidden_abilitys": ["ようりょくそ"]
   },
   {
     "no": 3,
     "name": "フシギバナ",
-    "types": ["くさ", "どく"]
+    "types": ["くさ", "どく"],
+    "abilitys": ["しんりょく"],
+    "hidden_abilitys": ["ようりょくそ"]
+  },
+  {
+    "no": 4,
+    "name": "ヒトカゲ",
+    "types": ["ほのお"],
+    "abilitys": ["もうか"],
+    "hidden_abilitys": ["サンパワー"]
+  },
+  {
+    "no": 5,
+    "name": "リザード",
+    "types": ["ほのお"],
+    "abilitys": ["もうか"],
+    "hidden_abilitys": ["サンパワー"]
+  },
+  {
+    "no": 6,
+    "name": "リザードン",
+    "types": ["ほのお", "ひこう"],
+    "abilitys": ["もうか"],
+    "hidden_abilitys": ["サンパワー"]
+  },
+  {
+    "no": 7,
+    "name": "ゼニガメ",
+    "types": ["みず"],
+    "abilitys": ["げきりゅう"],
+    "hidden_abilitys": ["あめうけざら"]
+  },
+  {
+    "no": 8,
+    "name": "カメール",
+    "types": ["みず"],
+    "abilitys": ["げきりゅう"],
+    "hidden_abilitys": ["あめうけざら"]
+  },
+  {
+    "no": 9,
+    "name": "カメックス",
+    "types": ["みず"],
+    "abilitys": ["げきりゅう"],
+    "hidden_abilitys": ["あめうけざら"]
   }
 ]
