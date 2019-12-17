@@ -21,8 +21,8 @@ function get_types_and_abilitys($pokemons, $search)
 {
     foreach ($pokemons as $pokemon) {
         if ($pokemon['name'] === $search) {
-            $pokemon_types = $pokemon['types'];
-            $pokemon_abilitys = $pokemon['abilitys'];
+            $pokemon_types           = $pokemon['types'];
+            $pokemon_abilitys        = $pokemon['abilitys'];
             $pokemon_hidden_abilitys = $pokemon['hidden_abilitys'];
             break;
         }
@@ -45,8 +45,8 @@ function get_weakness_and_resistance($pokemon_type, $types)
 {
     foreach ($types as $type) {
         if ($pokemon_type == $type['name']) {
-            $weak_types = $type['weaks'];
-            $resist_types = $type['resists'];
+            $weak_types    = $type['weaks'];
+            $resist_types  = $type['resists'];
             $invalid_types = $type['invalids'];
         }
     }
@@ -78,18 +78,18 @@ function calc_damage($mode, $type, $search_types, $damage)
 // 出力用タイプの整形
 function trim_display_types($result_types)
 {
-    $weak4 = "";
-    $weak2 = "";
-    $resist = "";
+    $weak4          = "";
+    $weak2          = "";
+    $resist         = "";
     $resist_quarter = "";
-    $invalid = "";
+    $invalid        = "";
     foreach ($result_types as $result_type) {
         if ($result_type['damage'] == 4) {
-            $weak4 .= "・" . $result_type['name'] . "\n";
+            $weak4   .= "・" . $result_type['name'] . "\n";
         } elseif ($result_type['damage'] == 2) {
-            $weak2 .= "・" . $result_type['name'] . "\n";
+            $weak2   .= "・" . $result_type['name'] . "\n";
         } elseif ($result_type['damage'] == 0.5) {
-            $resist .= "・" . $result_type['name'] . "\n";
+            $resist  .= "・" . $result_type['name'] . "\n";
         } elseif ($result_type['damage'] == 0.25) {
             $resist_quarter .= "・" . $result_type['name'] . "\n";
         } elseif ($result_type['damage'] == 0) {
@@ -225,18 +225,19 @@ function return_post($text, $replyToken, $accessToken)
     ];
     $post_data = [
         "replyToken" => $replyToken,
-        "messages" => [$response_format_text],
+        "messages"   => [$response_format_text],
     ];
-    $ch = curl_init("https://api.line.me/v2/bot/message/reply");
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($post_data));
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-        'Content-Type: application/json; charser=UTF-8',
-        'Authorization: Bearer ' . $accessToken,
-    ));
-    return $ch;
+    $curl = curl_init("https://api.line.me/v2/bot/message/reply");
+    curl_setopt_array($curl, [
+        CURLOPT_POST           => true,
+        CURLOPT_CUSTOMREQUEST  => 'POST',
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POSTFIELDS     => json_encode($post_data),
+        CURLOPT_HTTPHEADER     => array(
+            'Content-Type: application/json; charser=UTF-8',
+            'Authorization: Bearer ' . $accessToken)
+    ]);
+    return $curl;
 }
 
 // 環境変数読み込み
@@ -246,10 +247,10 @@ $accessToken = $_ENV["LINE_KEY"];
 
 //ユーザーからのメッセージ取得
 $json_string = file_get_contents('php://input');
-$jsonObj = json_decode($json_string);
+$jsonObj     = json_decode($json_string);
 
 //メッセージ取得
-$type = $jsonObj->{"events"}[0]->{"message"}->{"type"};
+$type  = $jsonObj->{"events"}[0]->{"message"}->{"type"};
 $input = $jsonObj->{"events"}[0]->{"message"}->{"text"};
 
 //ReplyToken取得
@@ -263,29 +264,29 @@ if ($type != "text") {
 // jsonファイル読み込み
 // データ読み込み
 $pokemons = load_json("json/pokemon.json");
-$types = load_json("json/pokemon_type.json");
+$types    = load_json("json/pokemon_type.json");
 
 // 存在チェック
 if (check_exist($input, $pokemons, 'name') == false) {
-    $text = "該当するポケモンが見つかりません…";
-    $ch = return_post($text, $replyToken, $accessToken);
-    $result = curl_exec($ch);
-    curl_close($ch);
+    $text   = "該当するポケモンが見つかりません…";
+    $curl   = return_post($text, $replyToken, $accessToken);
+    $result = curl_exec($curl);
+    curl_close($curl);
 }
 
 // ポケモンの名前、タイプと特性を取得
-$pokemon = array();
+$pokemon         = array();
 $pokemon['name'] = $input;
 list($pokemon_types, $pokemon_abilitys, $pokemon_hidden_abilitys) = get_types_and_abilitys($pokemons, $input);
 
 // ポケモンのタイプ、特性を整形
-$pokemon['type'] = trim_array_to_text($pokemon_types);
-$pokemon['ability'] = trim_array_to_text($pokemon_abilitys);
+$pokemon['type']           = trim_array_to_text($pokemon_types);
+$pokemon['ability']        = trim_array_to_text($pokemon_abilitys);
 $pokemon['hidden_ability'] = trim_array_to_text($pokemon_hidden_abilitys);
 
 // ポケモンの弱点、いまひとつ、無効タイプを取得
-$pokemon_weak_types = array();
-$pokemon_resist_types = array();
+$pokemon_weak_types    = array();
+$pokemon_resist_types  = array();
 $pokemon_invalid_types = array();
 foreach ($pokemon_types as $pokemon_type) {
     list($weak_types, $resist_types, $invalid_types) = get_weakness_and_resistance($pokemon_type, $types);
@@ -303,10 +304,10 @@ foreach ($pokemon_types as $pokemon_type) {
 // 弱点、いまひとつ、無効の計算
 $result_types = array();
 foreach ($types as $type) {
-    $damage = 1;
-    $damage = calc_damage('weak', $type['name'], $pokemon_weak_types, $damage);
-    $damage = calc_damage('resist', $type['name'], $pokemon_resist_types, $damage);
-    $damage = calc_damage('invalid', $type['name'], $pokemon_invalid_types, $damage);
+    $damage         = 1;
+    $damage         = calc_damage('weak', $type['name'], $pokemon_weak_types, $damage);
+    $damage         = calc_damage('resist', $type['name'], $pokemon_resist_types, $damage);
+    $damage         = calc_damage('invalid', $type['name'], $pokemon_invalid_types, $damage);
     $result_types[] = array('name' => $type['name'], 'damage' => $damage);
 }
 
@@ -314,7 +315,7 @@ foreach ($types as $type) {
 list($pokemon['weak4'], $pokemon['weak2'], $pokemon['resist'], $pokemon['resist_quarter'], $pokemon['invalid']) = trim_display_types($result_types);
 
 // 結果を返す
-$text = trim_result($pokemon);
-$ch = return_post($text, $replyToken, $accessToken);
-$result = curl_exec($ch);
-curl_close($ch);
+$text   = trim_result($pokemon);
+$curl   = return_post($text, $replyToken, $accessToken);
+$result = curl_exec($curl);
+curl_close($curl);
