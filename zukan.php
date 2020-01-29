@@ -14,6 +14,12 @@ function check_exist($input, $pokemons) {
     return in_array($input, array_column($pokemons, 'name'));
 }
 
+class Pokemon {
+    public function __construct(string $name) {
+        $this->name = $name;
+    }
+}
+
 // // 環境変数読み込み
 // $dotenv = Dotenv::create(__DIR__);
 // $dotenv->load();
@@ -42,10 +48,20 @@ function check_exist($input, $pokemons) {
 // jsonファイル読み込み
 $pokemons = load_json("json/pokemon.json");
 
-$input = 'ピカチュウ';
+$input = 'シェイミ';
 
-if (check_exist($input, $pokemons)) {
-  echo 'いるよ';
-} else {
-  echo 'いないよ';
+// 存在チェック
+if (check_exist($input, $pokemons) === false) {
+    $return_text = '該当するポケモンが見つかりませんでした。';
+    echo $return_text;
+    exit;
+}
+
+$i = 1;
+foreach ($pokemons as $pokemon) {
+    if ($pokemon['name'] === $input) {
+        $pokemon_obj    = 'pokemon' . $i;
+        ${$pokemon_obj} = new Pokemon($pokemon['name']);
+        echo var_dump(${$pokemon_obj});
+    }
 }
