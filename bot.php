@@ -39,20 +39,17 @@ class Pokemon {
     public function setResult() {
         $line         = "--------------------\n";
         $text         = $line;
+        $text        .= "【{$this->name}】\n";
 
-        $text        .= "【{$this->name}";
-
-        // フォルムチェンジ or リージョンフォームがあれば、名前の後ろに追記
-        if ($this->form) $text .= "({$this->form})";
-
-        $text        .= "】\n";
+        // フォルムチェンジ or リージョンフォームがあれば、名前の下に追記
+        if ($this->form) $text .= "（{$this->form}）\n";
 
         $text        .= $line;
         $text        .= "タイプ　：{$this->outputTypes}\n";
         $text        .= "とくせい：{$this->outputAbilities}\n";
 
         // 夢特性があれば表示
-        if ($this->hidden_abilities) $text .= "かくれとくせい：{$this->outputHiddenAbilities}\n";
+        if ($this->hidden_abilities) $text .= "（{$this->outputHiddenAbilities}）\n";
 
         $text        .= $line;
         $text        .= "ＨＰ　　：{$this->status['h']}\n";
@@ -60,28 +57,28 @@ class Pokemon {
         $text        .= "ぼうぎょ：{$this->status['b']}\n";
         $text        .= "とくこう：{$this->status['c']}\n";
         $text        .= "とくぼう：{$this->status['d']}\n";
-        $text        .= "すばやさ：{$this->status['s']}\n";
+        $text        .= "すばやさ：{$this->status['s']}\n\n";
         $this->result = $text;
     }
 }
 
 // 結果を返す
-function returnPost($text, $replyToken, $accessToken)
+function return_post($text, $replyToken, $accessToken)
 {
-    $responseFormatText = [
+    $response_format_text = [
         "type" => "text",
         "text" => $text,
     ];
-    $postData = [
+    $post_data = [
         "replyToken" => $replyToken,
-        "messages"   => [$responseFormatText],
+        "messages"   => [$response_format_text],
     ];
     $curl = curl_init("https://api.line.me/v2/bot/message/reply");
     curl_setopt_array($curl, [
         CURLOPT_POST           => true,
         CURLOPT_CUSTOMREQUEST  => 'POST',
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_POSTFIELDS     => json_encode($postData),
+        CURLOPT_POSTFIELDS     => json_encode($post_data),
         CURLOPT_HTTPHEADER     => array(
             'Content-Type: application/json; charser=UTF-8',
             'Authorization: Bearer ' . $accessToken)
@@ -98,11 +95,11 @@ $accessToken = $_ENV["LINE_KEY"];
 $json_string = file_get_contents('php://input');
 $jsonObj     = json_decode($json_string);
 
-//メッセージ取得
+// メッセージ取得
 $type        = $jsonObj->{"events"}[0]->{"message"}->{"type"};
 $input       = $jsonObj->{"events"}[0]->{"message"}->{"text"};
 
-//ReplyToken取得
+// ReplyToken取得
 $replyToken  = $jsonObj->{"events"}[0]->{"replyToken"};
 
 //メッセージ以外のときは何も返さず終了
@@ -115,14 +112,17 @@ $pokemons = load_json("json/pokemon.json");
 
 // 存在チェック
 if (check_exist($input, $pokemons) === false) {
-    $return_text = '該当するポケモンが見つかりませんでした…';
-    echo $return_text;
+    $text   = '該当するポケモンが見つかりません…';
+    $curl   = return_post($text, $replyToken, $accessToken);
+    $result = curl_exec($curl);
+    curl_close($curl);
     exit;
 }
 
 // ポケモンのデータを探す
-$resultText = "";
+$result_text = "";
 $i           = 1;
+
 foreach ($pokemons as $pokemon) {
     if ($pokemon['name'] === $input) {
 
@@ -141,10 +141,10 @@ foreach ($pokemons as $pokemon) {
         ${$pokemon_obj}->setResult();
 
         // 結果を返す
-        $resultText .= ${$pokemon}->result;
+        $result_text .= ${$pokemon_obj}->result;
         $i ++;
     }
 }
-$curl   = return_post($resultText, $replyToken, $accessToken);
+$curl   = return_post($result_text, $replyToken, $accessToken);
 $result = curl_exec($curl);
 curl_close($curl);
