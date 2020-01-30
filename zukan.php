@@ -35,7 +35,7 @@ class Pokemon {
         $this->outputHiddenAbilities = implode(",", $this->hidden_abilities);
     }
 
-    // 出力する形に整形
+    // 出力する形に成形
     public function setResult() {
         $line         = "--------------------\n";
         $text         = $line;
@@ -65,35 +65,53 @@ class Pokemon {
     }
 }
 
-// // 環境変数読み込み
-// $dotenv = Dotenv::create(__DIR__);
-// $dotenv->load();
-// $accessToken = $_ENV["LINE_KEY"];
+// 結果を返す
+function returnPost($text, $replyToken, $accessToken)
+{
+    $response_format_text = [
+        "type" => "text",
+        "text" => $text,
+    ];
+    $post_data = [
+        "replyToken" => $replyToken,
+        "messages"   => [$response_format_text],
+    ];
+    $curl = curl_init("https://api.line.me/v2/bot/message/reply");
+    curl_setopt_array($curl, [
+        CURLOPT_POST           => true,
+        CURLOPT_CUSTOMREQUEST  => 'POST',
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POSTFIELDS     => json_encode($post_data),
+        CURLOPT_HTTPHEADER     => array(
+            'Content-Type: application/json; charser=UTF-8',
+            'Authorization: Bearer ' . $accessToken)
+    ]);
+    return $curl;
+}
 
-// //ユーザーからのメッセージ取得
-// $json_string = file_get_contents('php://input');
-// $jsonObj     = json_decode($json_string);
+// 環境変数読み込み
+$dotenv      = Dotenv::create(__DIR__);
+$dotenv->load();
+$accessToken = $_ENV["LINE_KEY"];
 
-// //ユーザーからのメッセージ取得
-// $json_string = file_get_contents('php://input');
-// $jsonObj     = json_decode($json_string);
+//ユーザーからのメッセージ取得
+$json_string = file_get_contents('php://input');
+$jsonObj     = json_decode($json_string);
 
-// //メッセージ取得
-// $type        = $jsonObj->{"events"}[0]->{"message"}->{"type"};
-// $input       = $jsonObj->{"events"}[0]->{"message"}->{"text"};
+//メッセージ取得
+$type        = $jsonObj->{"events"}[0]->{"message"}->{"type"};
+$input       = $jsonObj->{"events"}[0]->{"message"}->{"text"};
 
-// //ReplyToken取得
-// $replyToken  = $jsonObj->{"events"}[0]->{"replyToken"};
+//ReplyToken取得
+$replyToken  = $jsonObj->{"events"}[0]->{"replyToken"};
 
-// //メッセージ以外のときは何も返さず終了
-// if ($type != "text") {
-//     exit;
-// }
+//メッセージ以外のときは何も返さず終了
+if ($type != "text") {
+    exit;
+}
 
 // jsonファイル読み込み
 $pokemons = load_json("json/pokemon.json");
-
-$input = 'シェイミ';
 
 // 存在チェック
 if (check_exist($input, $pokemons) === false) {
@@ -102,7 +120,9 @@ if (check_exist($input, $pokemons) === false) {
     exit;
 }
 
-$i = 1;
+// ポケモンのデータを探す
+$resultText = "";
+$i           = 1;
 foreach ($pokemons as $pokemon) {
     if ($pokemon['name'] === $input) {
 
@@ -116,8 +136,15 @@ foreach ($pokemons as $pokemon) {
         // ポケモンのデータを取得
         ${$pokemon_obj}->getPokemonData($pokemon);
 
+        // 出力する形に成形
         ${$pokemon_obj}->setOutputText();
         ${$pokemon_obj}->setResult();
-        echo var_dump(${$pokemon_obj}->result);
+
+        // 結果を返す
+        $resultText .= ${$pokemon}->result;
+        $i ++;
     }
 }
+$curl   = return_post($resultText, $replyToken, $accessToken);
+$result = curl_exec($curl);
+curl_close($curl);
