@@ -16,7 +16,53 @@ function check_exist($input, $pokemons) {
 
 class Pokemon {
     public function __construct(string $name) {
-        $this->name = $name;
+        $this->name                  = $name;
+    }
+
+    // ポケモンの基本データを取得
+    public function getPokemonData($pokemon) {
+        $this->form                  = $pokemon['form'];
+        $this->types                 = $pokemon['types'];
+        $this->abilities             = $pokemon['abilities'];
+        $this->hidden_abilities      = $pokemon['hidden_abilities'];
+        $this->status                = $pokemon['status'];
+    }
+
+    // カンマ区切り項目を、出力用としてひとつの文字列にする
+    public function setOutputText() {
+        $this->outputTypes           = implode(",", $this->types);
+        $this->outputAbilities       = implode(",", $this->abilities);
+        $this->outputHiddenAbilities = implode(",", $this->hidden_abilities);
+    }
+
+    // 出力する形に整形
+    public function setResult() {
+        $line         = "--------------------\n";
+        $text         = $line;
+
+        $text        .= "【{$this->name}";
+
+        // フォルムチェンジ or リージョンフォームがあれば、名前の後ろに追記
+        if ($this->form) {
+            $text .= "({$this->form})";
+        }
+        $text        .= "】\n";
+
+        $text        .= $line;
+        $text        .= "タイプ：{$this->outputTypes}\n";
+        $text        .= "とくせい：{$this->outputAbilities}\n";
+
+        // 夢特性があれば表示
+        if ($this->hidden_abilities) $text .= "かくれとくせい：{$this->outputHiddenAbilities}";
+
+        $text        .= $line;
+        $text        .= "ＨＰ　　：{$this->status['h']}\n";
+        $text        .= "こうげき：{$this->status['a']}\n";
+        $text        .= "ぼうぎょ：{$this->status['b']}\n";
+        $text        .= "とくこう：{$this->status['c']}\n";
+        $text        .= "とくぼう：{$this->status['d']}\n";
+        $text        .= "すばやさ：{$this->status['s']}\n";
+        $this->result = $text;
     }
 }
 
@@ -52,7 +98,7 @@ $input = 'シェイミ';
 
 // 存在チェック
 if (check_exist($input, $pokemons) === false) {
-    $return_text = '該当するポケモンが見つかりませんでした。';
+    $return_text = '該当するポケモンが見つかりませんでした…';
     echo $return_text;
     exit;
 }
@@ -60,8 +106,19 @@ if (check_exist($input, $pokemons) === false) {
 $i = 1;
 foreach ($pokemons as $pokemon) {
     if ($pokemon['name'] === $input) {
+
+        // 名前を取得
+        $pokemon_name = $pokemon['name'];
+
+        // ポケモンのオブジェクト作成
         $pokemon_obj    = 'pokemon' . $i;
-        ${$pokemon_obj} = new Pokemon($pokemon['name']);
-        echo var_dump(${$pokemon_obj});
+        ${$pokemon_obj} = new Pokemon($pokemon_name);
+
+        // ポケモンのデータを取得
+        ${$pokemon_obj}->getPokemonData($pokemon);
+
+        ${$pokemon_obj}->setOutputText();
+        ${$pokemon_obj}->setResult();
+        echo var_dump(${$pokemon_obj}->result);
     }
 }
