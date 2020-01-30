@@ -43,17 +43,16 @@ class Pokemon {
         $text        .= "【{$this->name}";
 
         // フォルムチェンジ or リージョンフォームがあれば、名前の後ろに追記
-        if ($this->form) {
-            $text .= "({$this->form})";
-        }
+        if ($this->form) $text .= "({$this->form})";
+
         $text        .= "】\n";
 
         $text        .= $line;
-        $text        .= "タイプ：{$this->outputTypes}\n";
+        $text        .= "タイプ　：{$this->outputTypes}\n";
         $text        .= "とくせい：{$this->outputAbilities}\n";
 
         // 夢特性があれば表示
-        if ($this->hidden_abilities) $text .= "かくれとくせい：{$this->outputHiddenAbilities}";
+        if ($this->hidden_abilities) $text .= "かくれとくせい：{$this->outputHiddenAbilities}\n";
 
         $text        .= $line;
         $text        .= "ＨＰ　　：{$this->status['h']}\n";
