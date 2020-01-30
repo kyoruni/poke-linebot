@@ -68,20 +68,20 @@ class Pokemon {
 // 結果を返す
 function returnPost($text, $replyToken, $accessToken)
 {
-    $response_format_text = [
+    $responseFormatText = [
         "type" => "text",
         "text" => $text,
     ];
-    $post_data = [
+    $postData = [
         "replyToken" => $replyToken,
-        "messages"   => [$response_format_text],
+        "messages"   => [$responseFormatText],
     ];
     $curl = curl_init("https://api.line.me/v2/bot/message/reply");
     curl_setopt_array($curl, [
         CURLOPT_POST           => true,
         CURLOPT_CUSTOMREQUEST  => 'POST',
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_POSTFIELDS     => json_encode($post_data),
+        CURLOPT_POSTFIELDS     => json_encode($postData),
         CURLOPT_HTTPHEADER     => array(
             'Content-Type: application/json; charser=UTF-8',
             'Authorization: Bearer ' . $accessToken)
