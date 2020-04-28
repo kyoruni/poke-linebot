@@ -8,6 +8,14 @@
 
 - フォルムチェンジ、リージョンフォームは同じポケモンとして扱います
 
+### 画面イメージ
+
+![e0fJu6bYeJBlRYy1588063204_1588063227](https://user-images.githubusercontent.com/40832190/80466340-63668c80-8977-11ea-89eb-db3d6e273ef5.jpg)
+
+#### ↓↓ こちらからお試しできます！ ↓↓
+
+![botQR](https://user-images.githubusercontent.com/40832190/80465938-cad00c80-8976-11ea-8a20-7e4a191d5331.png)
+
 ### やりたいこと
 
 - 一匹ずつしか表示できないので、複数同時検索できるようにしたい
